@@ -1,0 +1,21 @@
+[Unit]
+Description=LDKH Web GIS FastAPI Backend (Uvicorn)
+After=network-online.target
+Wants=network-online.target
+# Pastikan mount point dokumen PDF Synology (Read-Only) sudah tersedia
+ConditionPathIsDirectory=/mnt/synology/LDKH-Documents
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/rb-gis/backend
+EnvironmentFile=/opt/rb-gis/backend/.env
+ExecStart=/opt/rb-gis/backend/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2 --proxy-headers --forwarded-allow-ips="172.16.10.100,127.0.0.1"
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+# Hardening tambahan: kunci paksa path dokumen Synology sebagai Read-Only dari sisi systemd
+ReadOnlyPaths=/mnt/synology/LDKH-Documents
+
+[Install]
+WantedBy=multi-user.target

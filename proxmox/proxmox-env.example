@@ -1,0 +1,67 @@
+# ==============================================================================
+# Konfigurasi Deployment Proxmox VE Multi-LXC & Synology DS218j
+# Salin file ini menjadi .env.proxmox sebelum menjalankan script di infra/proxmox/
+# JANGAN PERNAH commit file .env.proxmox ke Git.
+# ==============================================================================
+
+# --- Proxmox VE Host & LXC Defaults ---
+PROXMOX_HOST_IP="172.16.10.1"
+LXC_TEMPLATE="local:vztmpl/ubuntu-24.04-standard_24.04-2_amd64.tar.zst"
+LXC_STORAGE="local-lvm"
+LXC_BRIDGE="vmbr0"
+LAN_PREFIX="24"
+GATEWAY_IP="172.16.10.254"
+DNS_SERVER="1.1.1.1"
+LXC_ROOT_PASSWORD="CHANGE_ME_TEMP_CT_PASSWORD"
+
+# --- Topologi Multi-LXC (Produksi Proxmox VE) ---
+CT_NGINX_ID="430"
+CT_NGINX_IP="172.16.10.133"
+
+CT_NEXTCLOUD_ID="110"
+CT_NEXTCLOUD_IP="172.16.10.110"
+
+CT_DB_ID="420"
+CT_DB_IP="172.16.10.132"
+CT_DB_CORES="2"
+CT_DB_RAM_MB="3072"
+CT_DB_DISK_GB="32"
+
+CT_BACKEND_ID="440"
+CT_BACKEND_IP="172.16.10.130"
+CT_BACKEND_CORES="2"
+CT_BACKEND_RAM_MB="2048"
+CT_BACKEND_DISK_GB="16"
+
+CT_FRONTEND_ID="410"
+CT_FRONTEND_IP="172.16.10.131"
+CT_FRONTEND_CORES="2"
+CT_FRONTEND_RAM_MB="2048"
+CT_FRONTEND_DISK_GB="16"
+
+# --- Synology NAS (Cross-Subnet Storage Vault) ---
+SYNOLOGY_IP="192.168.18.130"
+SYNOLOGY_NFS_EXPORT="/volume1/LDKH-Documents"
+SYNOLOGY_BACKUP_EXPORT="/volume1/Proxmox-Backup"
+HOST_SYNOLOGY_MOUNT="/mnt/synology-ldkh"
+HOST_BACKUP_MOUNT="/mnt/pve/synology-backup"
+CONTAINER_SYNOLOGY_MOUNT="/mnt/synology/LDKH-Documents"
+CONTAINER_BACKUP_MOUNT="/mnt/synology/backups"
+
+# --- PostgreSQL + PostGIS ---
+POSTGRES_DB="ldkh_gis"
+POSTGRES_USER="ldkh_admin"
+POSTGRES_PASSWORD="CHANGE_ME_STRONG_DB_PASSWORD"
+QGIS_SUBNET_CIDR="172.16.10.0/24"
+
+# --- Aplikasi Backend & Frontend ---
+APP_REPO_DIR="/opt/rb-gis"
+SECRET_KEY="CHANGE_ME_64_CHAR_RANDOM_HMAC_SECRET"
+PDF_TOKEN_EXPIRE_SECONDS="900"
+GEMINI_API_KEY=""
+GEMINI_MODEL="gemini-4-hydrogen"
+
+# --- Cloudflare Tunnel & Zero Trust (CT 430 gis-nginx) ---
+CLOUDFLARE_TUNNEL_DOMAIN="gis.rbeverything.com"
+CLOUDFLARE_TUNNEL_NAME="ldkh-gis-tunnel"
+CLOUDFLARE_TUNNEL_TOKEN=""

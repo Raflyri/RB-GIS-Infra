@@ -1,0 +1,6 @@
+proxmox/.env.proxmox
+.env
+.env.*
+!proxmox/proxmox-env.example
+postgres/data/
+*.log
