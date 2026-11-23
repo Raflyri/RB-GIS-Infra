@@ -90,11 +90,14 @@ BEGIN
         CREATE TYPE user_role_enum AS ENUM (
             'ADMIN',
             'AUDITOR',
-            'VIEWER'
+            'VIEWER',
+            'GUEST'
         );
     END IF;
 END
 $$;
+
+ALTER TYPE user_role_enum ADD VALUE IF NOT EXISTS 'GUEST';
 
 -- 1. Tabel Spasial: parcels
 CREATE TABLE IF NOT EXISTS parcels (
@@ -209,6 +212,44 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE INDEX IF NOT EXISTS ix_users_email ON users (email);
 CREATE INDEX IF NOT EXISTS ix_users_role ON users (role);
+
+-- 6. Tabel Guest Access JIT & Sesi Guest (Hermes AI Agent WhatsApp)
+CREATE TABLE IF NOT EXISTS guest_access_requests (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    short_code VARCHAR(12) NOT NULL UNIQUE,
+    confirm_token_hash VARCHAR(64) NOT NULL UNIQUE,
+    wait_token_hash VARCHAR(64) NOT NULL UNIQUE,
+    guest_name VARCHAR(100),
+    ip_address VARCHAR(64) NOT NULL,
+    user_agent TEXT NOT NULL,
+    device_summary VARCHAR(160) NOT NULL,
+    status VARCHAR(24) NOT NULL DEFAULT 'PENDING',
+    requested_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    request_expires_at TIMESTAMPTZ NOT NULL,
+    decided_at TIMESTAMPTZ,
+    decided_via VARCHAR(32),
+    hermes_notified_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS ix_guest_access_requests_short_code ON guest_access_requests (short_code);
+CREATE INDEX IF NOT EXISTS ix_guest_access_requests_confirm_token_hash ON guest_access_requests (confirm_token_hash);
+CREATE INDEX IF NOT EXISTS ix_guest_access_requests_wait_token_hash ON guest_access_requests (wait_token_hash);
+CREATE INDEX IF NOT EXISTS ix_guest_access_requests_ip_address ON guest_access_requests (ip_address);
+CREATE INDEX IF NOT EXISTS ix_guest_access_requests_status ON guest_access_requests (status);
+CREATE INDEX IF NOT EXISTS ix_guest_access_requests_requested_at ON guest_access_requests (requested_at);
+
+CREATE TABLE IF NOT EXISTS guest_sessions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    request_id UUID NOT NULL UNIQUE REFERENCES guest_access_requests(id) ON DELETE CASCADE,
+    ip_address VARCHAR(64) NOT NULL,
+    device_summary VARCHAR(160) NOT NULL,
+    started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    expires_at TIMESTAMPTZ NOT NULL,
+    revoked_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS ix_guest_sessions_request_id ON guest_sessions (request_id);
+CREATE INDEX IF NOT EXISTS ix_guest_sessions_expires_at ON guest_sessions (expires_at);
 
 -- =============================================================================
 -- SEED DATA SAMPEL DESA SUKAHARJA (JABODETABEK)

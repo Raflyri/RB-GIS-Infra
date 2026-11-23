@@ -1,0 +1,76 @@
+{
+  "tools": [
+    {
+      "functionDeclarations": [
+        {
+          "name": "approve_gis_guest",
+          "description": "Menyetujui permintaan akses Guest sementara (Read-Only 3 jam) ke Sistem Web GIS LDKH setelah Owner membalas Yes / Ya / Izinkan di WhatsApp.",
+          "parameters": {
+            "type": "OBJECT",
+            "properties": {
+              "short_code": {
+                "type": "STRING",
+                "description": "Kode unik permintaan Guest berformat G-XXXX (opsional jika hanya ada tepat 1 permintaan PENDING aktif)."
+              },
+              "sender_wa": {
+                "type": "STRING",
+                "description": "Nomor WhatsApp pengirim pesan konfirmasi untuk diverifikasi terhadap ALLOWED_OWNER_WA_NUMBER."
+              }
+            },
+            "required": ["sender_wa"]
+          }
+        },
+        {
+          "name": "reject_gis_guest",
+          "description": "Menolak permintaan akses Guest ke Sistem Web GIS LDKH setelah Owner membalas No / Tidak / Tolak di WhatsApp.",
+          "parameters": {
+            "type": "OBJECT",
+            "properties": {
+              "short_code": {
+                "type": "STRING",
+                "description": "Kode unik permintaan Guest berformat G-XXXX (opsional jika hanya ada tepat 1 permintaan PENDING aktif)."
+              },
+              "sender_wa": {
+                "type": "STRING",
+                "description": "Nomor WhatsApp pengirim pesan penolakan untuk diverifikasi terhadap ALLOWED_OWNER_WA_NUMBER."
+              }
+            },
+            "required": ["sender_wa"]
+          }
+        },
+        {
+          "name": "revoke_gis_guest",
+          "description": "Mencabut sesi akses Guest yang sedang berjalan seketika jika Owner memerintahkan Cabut / Revoke akses Guest di WhatsApp.",
+          "parameters": {
+            "type": "OBJECT",
+            "properties": {
+              "short_code": {
+                "type": "STRING",
+                "description": "Kode unik sesi Guest berformat G-XXXX yang ingin dicabut (opsional jika hanya 1 sesi aktif)."
+              },
+              "sender_wa": {
+                "type": "STRING",
+                "description": "Nomor WhatsApp pengirim perintah pencabutan untuk diverifikasi terhadap ALLOWED_OWNER_WA_NUMBER."
+              }
+            },
+            "required": ["sender_wa"]
+          }
+        },
+        {
+          "name": "list_pending_gis_guests",
+          "description": "Mengambil daftar seluruh permintaan akses Guest yang saat ini masih berstatus PENDING dan belum kedaluwarsa.",
+          "parameters": {
+            "type": "OBJECT",
+            "properties": {
+              "sender_wa": {
+                "type": "STRING",
+                "description": "Nomor WhatsApp pengirim permintaan daftar antrean untuk diverifikasi terhadap ALLOWED_OWNER_WA_NUMBER."
+              }
+            },
+            "required": ["sender_wa"]
+          }
+        }
+      ]
+    }
+  ]
+}

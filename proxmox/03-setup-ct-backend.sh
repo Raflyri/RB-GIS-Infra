@@ -74,14 +74,21 @@ TRUSTED_PROXY_IPS=127.0.0.1,::1,${CT_NGINX_IP},${CT_FRONTEND_IP}
 CORS_ORIGINS=https://${CLOUDFLARE_TUNNEL_DOMAIN},http://${CT_NGINX_IP},http://${CT_FRONTEND_IP}:3000
 GEMINI_API_KEY=${GEMINI_API_KEY:-}
 GEMINI_MODEL=${GEMINI_MODEL:-gemini-4-hydrogen}
+APP_PUBLIC_URL=https://${CLOUDFLARE_TUNNEL_DOMAIN}
+HERMES_SHARED_SECRET=${HERMES_SHARED_SECRET:-change-this-hermes-shared-secret-64-hex}
+HERMES_WEBHOOK_URL=${HERMES_WEBHOOK_URL:-http://10.10.10.167:8787/webhook/gis-guest}
+HERMES_ALLOWED_IPS=${HERMES_ALLOWED_IPS:-10.10.10.167,127.0.0.1}
+GUEST_REQUEST_TTL_MINUTES=${GUEST_REQUEST_TTL_MINUTES:-30}
+GUEST_SESSION_TTL_HOURS=${GUEST_SESSION_TTL_HOURS:-3}
 EOF
 chmod 600 "${BACKEND_DIR}/.env"
 mkdir -p "${BACKEND_DIR}/storage/uploads"
 
-# Rekomendasi Firewall LXC Backend (UFW): hanya izinkan port 8000 dari CT Nginx & CT Frontend
+# Rekomendasi Firewall LXC Backend (UFW): izinkan port 8000 dari CT Nginx, CT Frontend, & Hermes CT 101 (ZeroTier)
 if command -v ufw >/dev/null 2>&1; then
   ufw allow from "${CT_NGINX_IP}" to any port 8000 proto tcp || true
   ufw allow from "${CT_FRONTEND_IP}" to any port 8000 proto tcp || true
+  ufw allow from "10.10.10.167" to any port 8000 proto tcp || true
   ufw deny 8000/tcp || true
 fi
 

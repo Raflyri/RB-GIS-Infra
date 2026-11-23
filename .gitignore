@@ -2,5 +2,6 @@ proxmox/.env.proxmox
 .env
 .env.*
 !proxmox/proxmox-env.example
+!integrations/hermes-guest-bridge/.env.example
 postgres/data/
 *.log

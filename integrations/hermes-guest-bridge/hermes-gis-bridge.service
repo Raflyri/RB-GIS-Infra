@@ -1,0 +1,18 @@
+[Unit]
+Description=Hermes GIS Guest Access Bridge (CT 101 <-> CT 400 ZeroTier)
+After=network-online.target hermes-gateway.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/hermes-guest-bridge
+EnvironmentFile=/opt/hermes-guest-bridge/.env
+ExecStart=/opt/hermes-guest-bridge/.venv/bin/python /opt/hermes-guest-bridge/gis_hermes_bridge.py --action SERVE
+Restart=always
+RestartSec=5
+TimeoutStopSec=20
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
